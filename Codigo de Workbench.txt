@@ -1,0 +1,105 @@
+CREATE SCHEMA IF NOT EXISTS `farmacia2_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `farmacia2_db` ;
+
+-- -----------------------------------------------------
+-- Table `farmacia2_db`.`zips`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `farmacia2_db`.`zips` (
+  `zip` VARCHAR(6) NOT NULL,
+  `z_city` VARCHAR(35) NOT NULL,
+  `z_state` VARCHAR(35) NOT NULL,
+  PRIMARY KEY (`zip`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `farmacia2_db`.`clients`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `farmacia2_db`.`clients` (
+  `id_cliente` INT NOT NULL AUTO_INCREMENT,
+  `c_fname` VARCHAR(35) NOT NULL,
+  `c_sname1` VARCHAR(35) NOT NULL,
+  `c_sname2` VARCHAR(35) NULL DEFAULT NULL,
+  `c_street` VARCHAR(35) NOT NULL,
+  `c_noext` VARCHAR(7) NULL DEFAULT NULL,
+  `c_noint` VARCHAR(7) NULL DEFAULT NULL,
+  `c_col` VARCHAR(50) NULL DEFAULT NULL,
+  `c_zip` VARCHAR(6) NULL DEFAULT NULL,
+  `c_email` VARCHAR(20) NULL DEFAULT NULL,
+  `c_phone` VARCHAR(8) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_cliente`),
+  INDEX `fkzip_clients` (`c_zip` ASC) VISIBLE,
+  CONSTRAINT `fkzip_clients`
+    FOREIGN KEY (`c_zip`)
+    REFERENCES `farmacia2_db`.`zips` (`zip`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+AUTO_INCREMENT = 8
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `farmacia2_db`.`orders`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `farmacia2_db`.`orders` (
+  `id_order` INT NOT NULL AUTO_INCREMENT,
+  `id_cliente` INT NULL DEFAULT NULL,
+  `o_status` ENUM('PROCESSING', 'ACEPTED', 'SENT', 'RECEIVED') NOT NULL,
+  `o_date` DATE NOT NULL,
+  `o_total` FLOAT NOT NULL,
+  PRIMARY KEY (`id_order`),
+  INDEX `fkclient_orders` (`id_cliente` ASC) VISIBLE,
+  CONSTRAINT `fkclient_orders`
+    FOREIGN KEY (`id_cliente`)
+    REFERENCES `farmacia2_db`.`clients` (`id_cliente`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+AUTO_INCREMENT = 12
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `farmacia2_db`.`products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `farmacia2_db`.`products` (
+  `id_product` INT NOT NULL AUTO_INCREMENT,
+  `p_name` VARCHAR(35) NOT NULL,
+  `p_brand` VARCHAR(35) NOT NULL,
+  `p_descrip` VARCHAR(250) NOT NULL,
+  `p_price` FLOAT NOT NULL,
+  PRIMARY KEY (`id_product`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 12
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `farmacia2_db`.`order_details`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `farmacia2_db`.`order_details` (
+  `id_order` INT NOT NULL,
+  `id_product` INT NOT NULL,
+  `od_amount` INT NOT NULL,
+  `od_total` FLOAT NOT NULL,
+  PRIMARY KEY (`id_order`, `id_product`),
+  INDEX `fkproduct_ods` (`id_product` ASC) VISIBLE,
+  CONSTRAINT `fkorder_ods`
+    FOREIGN KEY (`id_order`)
+    REFERENCES `farmacia2_db`.`orders` (`id_order`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fkproduct_ods`
+    FOREIGN KEY (`id_product`)
+    REFERENCES `farmacia2_db`.`products` (`id_product`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;

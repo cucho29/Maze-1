@@ -1,0 +1,4 @@
+user:jc
+password:jc123
+host:localhost
+database:farmacia2_db
